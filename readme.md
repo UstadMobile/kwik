@@ -113,7 +113,8 @@ also can provide inspiration!
 Kwik is both a library that can be used in any Java application to set up and use a QUIC connection, 
 and a (sample) command line client that can be used to experiment with the QUIC protocol. 
 
-To run the sample client, execute the `kwik.sh` script or `java -jar build/libs/kwik.jar`. 
+To run the sample client, execute `./gradlew run --args="<args>"` or build the distribution zip using 
+`./gradlew distZip` and use the zip from `build/distributions/kwik.zip`. 
 
 Usage of the sample client:
 

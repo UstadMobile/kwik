@@ -1,18 +1,35 @@
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
+apply plugin: 'application'
 
 sourceCompatibility = 11
 targetCompatibility = 11
 
 repositories {
     mavenCentral()
+    maven {
+        url "https://devserver3.ustadmobile.com/maven2/"
+    }
 }
+
+
+application {
+    mainClass = 'net.luminis.quic.run.KwikCli'
+    applicationName = "kwik"
+}
+
+distributions {
+    main {
+        distributionBaseName = 'kwik'
+    }
+}
+
 
 dependencies {
     def junitVersion = "5.9.2"
 
-    implementation project(':agent15')
+    implementation "com.github.UstadMobile:agent15:0.1a"
 
     // https://mvnrepository.com/artifact/at.favre.lib/hkdf
     implementation group: 'at.favre.lib', name: 'hkdf', version: '1.0.1'
@@ -56,18 +73,6 @@ test {
     }
 }
 
-jar {
-    manifest {
-        attributes 'Main-Class': 'net.luminis.quic.run.KwikCli'
-    }
-
-    doFirst {
-        from {
-           configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-        }
-        exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
-    }
-}
 
 task determineVersion {
     doLast {

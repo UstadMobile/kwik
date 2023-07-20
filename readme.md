@@ -169,6 +169,15 @@ To run the demo web server, execute `java -cp kwik.jar net.luminis.quic.run.Samp
 This will start the server in retry-mode (see https://quicwg.org/base-drafts/rfc9000.html#name-address-validation-using-re).
 To run without retry-mode, add the `--noRetry` flag as first argument.  
 
+### Android
+
+KWIK client and server can be used on Android. You must use 
+[desugaring](https://developer.android.com/studio/write/java8-support#library-desugaring) version 2+ to 
+support the Java APIs used in kwik. You must also call the following before using kwik:
+```
+PlatformMapping.usePlatformMapping(PlatformMapping.Platform.Android)
+```
+
 ### Development
 
 To use IntelliJ for development, either just open the project directory in IntelliJ and it will pick up the gradle file,

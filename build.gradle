@@ -2,9 +2,14 @@ apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
 apply plugin: 'application'
+apply plugin: 'maven-publish'
 
 sourceCompatibility = 11
 targetCompatibility = 11
+
+group 'com.github.UstadMobile'
+version "0.1a"
+
 
 repositories {
     mavenCentral()
@@ -93,3 +98,14 @@ task determineVersion {
 }
 
 compileJava.dependsOn (determineVersion, processResources)
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifactId = "kwik"
+
+            from components.java
+        }
+    }
+}
+

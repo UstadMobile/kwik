@@ -66,6 +66,7 @@ public class QuicClientConnectionImpl extends QuicConnectionImpl implements Quic
     private final int port;
     private final QuicSessionTicket sessionTicket;
     private final TlsClientEngine tlsEngine;
+    private final DatagramSocketFactory socketFactory;
     private final DatagramSocket socket;
     private final InetAddress serverAddress;
     private final SenderImpl sender;
@@ -95,7 +96,10 @@ public class QuicClientConnectionImpl extends QuicConnectionImpl implements Quic
     private QuicClientConnectionImpl(String host, int port, QuicSessionTicket sessionTicket, Version originalVersion, Version preferredVersion, Logger log,
                                      String proxyHost, Path secretsFile, Integer initialRtt, Integer cidLength,
                                      List<TlsConstants.CipherSuite> cipherSuites,
-                                     X509Certificate clientCertificate, PrivateKey clientCertificateKey) throws UnknownHostException, SocketException {
+                                     X509Certificate clientCertificate, PrivateKey clientCertificateKey,
+                                     DatagramSocketFactory socketFactory
+
+    ) throws UnknownHostException, SocketException {
         super(originalVersion, Role.Client, secretsFile, log);
         log.info("Creating connection with " + host + ":" + port + " with " + originalVersion);
         this.originalVersion = originalVersion;
@@ -108,7 +112,8 @@ public class QuicClientConnectionImpl extends QuicConnectionImpl implements Quic
         this.clientCertificate = clientCertificate;
         this.clientCertificateKey = clientCertificateKey;
 
-        socket = new DatagramSocket();
+        this.socketFactory = socketFactory;
+        socket = socketFactory.createDatagramSocket();
 
         idleTimer = new IdleTimer(this, log);
         sender = new SenderImpl(quicVersion, getMaxPacketSize(), socket, new InetSocketAddress(serverAddress, port),
@@ -631,7 +636,7 @@ public class QuicClientConnectionImpl extends QuicConnectionImpl implements Quic
 
     public void changeAddress() {
         try {
-            DatagramSocket newSocket = new DatagramSocket();
+            DatagramSocket newSocket = socketFactory.createDatagramSocket();
             sender.changeAddress(newSocket);
             receiver.changeAddress(newSocket);
             log.info("Changed local address to " + newSocket.getLocalPort());
@@ -1029,6 +1034,8 @@ public class QuicClientConnectionImpl extends QuicConnectionImpl implements Quic
         private X509Certificate clientCertificate;
         private PrivateKey clientCertificateKey;
 
+        private DatagramSocketFactory datagramSocketFactory = new DefaultDatagramSocketFactory();
+
         @Override
         public QuicClientConnectionImpl build() throws SocketException, UnknownHostException {
             if (!quicVersion.isKnown() || !quicVersion.atLeast(Version.IETF_draft_29)) {
@@ -1046,7 +1053,8 @@ public class QuicClientConnectionImpl extends QuicConnectionImpl implements Quic
 
             QuicClientConnectionImpl quicConnection =
                     new QuicClientConnectionImpl(host, port, sessionTicket, quicVersion, preferredVersion, log, proxyHost,
-                            secretsFile, initialRtt, connectionIdLength, cipherSuites, clientCertificate, clientCertificateKey);
+                            secretsFile, initialRtt, connectionIdLength, cipherSuites, clientCertificate, clientCertificateKey,
+                            datagramSocketFactory);
 
             if (omitCertificateCheck) {
                 quicConnection.trustAnyServerCertificate();
@@ -1154,6 +1162,12 @@ public class QuicClientConnectionImpl extends QuicConnectionImpl implements Quic
         @Override
         public Builder clientCertificateKey(PrivateKey privateKey) {
             this.clientCertificateKey = privateKey;
+            return this;
+        }
+
+        @Override
+        public Builder datagramSocketFactory(DatagramSocketFactory datagramSocketFactory) {
+            this.datagramSocketFactory = datagramSocketFactory;
             return this;
         }
     }

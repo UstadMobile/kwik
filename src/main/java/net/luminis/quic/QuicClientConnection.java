@@ -101,6 +101,8 @@ public interface QuicClientConnection extends QuicConnection {
         Builder clientCertificate(X509Certificate certificate);
 
         Builder clientCertificateKey(PrivateKey privateKey);
+
+        Builder datagramSocketFactory(DatagramSocketFactory datagramSocketFactory);
     }
 
 }

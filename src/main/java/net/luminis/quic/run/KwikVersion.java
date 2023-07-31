@@ -39,7 +39,7 @@ public class KwikVersion {
 
     private static String extractVersion() {
         String version;
-        InputStream in = QuicConnection.class.getResourceAsStream("version.properties");
+        InputStream in = QuicConnection.class.getResourceAsStream("/net/luminis/quic/run/version.properties");
         if (in != null) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
                 version = reader.readLine();
